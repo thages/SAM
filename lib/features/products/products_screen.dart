@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:developer' as dev;
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import '../../../core/models/product.dart';
@@ -18,6 +21,8 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   late List<Product> _products;
   File? _image;
+  String openAiApiKey =
+      "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";
 
   @override
   void initState() {
@@ -71,7 +76,130 @@ class _ProductsScreenState extends State<ProductsScreen> {
       setState(() {
         _image = File(pickedFile.path);
       });
-      _processImage();
+      _processImageWithOpenAI();
+    }
+  }
+
+  // 📌 Processar OCR via OpenAI
+  // Future<void> _processImageWithOpenAI() async {
+  //   if (_image == null) return;
+
+  //   // // Converte imagem para base64
+  //   // String base64Image = base64Encode(await _image!.readAsBytes());
+
+  //   // // Define o prompt para a OpenAI
+  //   // String prompt =
+  //   //     "Extraia os produtos da nota fiscal e retorne os seguintes dados para cada item: "
+  //   //     "description (nome do produto), cant. (quantidade), precio (preço unitário), IVA (imposto aplicado). "
+  //   //     "Retorne a resposta em formato JSON.";
+
+  //   // // Chamada à API da OpenAI
+  //   // var response = await http.post(
+  //   //   Uri.parse("https://api.openai.com/v1/chat/completions"),
+  //   //   headers: {
+  //   //     "Authorization": "Bearer $openAiApiKey",
+  //   //     "Content-Type": "application/json",
+  //   //   },
+  //   //   body: jsonEncode({
+  //   //     "model": "gpt-4-vision-preview", // Usa GPT-4 com suporte a imagens
+  //   //     "messages": [
+  //   //       {
+  //   //         "role": "system",
+  //   //         "content":
+  //   //             "Você é um assistente especialista em OCR de notas fiscais.",
+  //   //       },
+  //   //       {
+  //   //         "role": "user",
+  //   //         "content": [
+  //   //           {"type": "text", "text": prompt},
+  //   //           {
+  //   //             "type": "image_url",
+  //   //             "image_url": "data:image/jpeg;base64,$base64Image",
+  //   //           },
+  //   //         ],
+  //   //       },
+  //   //     ],
+  //   //     "max_tokens": 1000,
+  //   //   }),
+  //   // );
+
+  //   if (response.statusCode == 200) {
+  //     var jsonResponse = jsonDecode(response.body);
+  //     String extractedText = jsonResponse["choices"][0]["message"]["content"];
+
+  //     _extrairDadosNotaFiscal(extractedText);
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text("Erro ao processar imagem: ${response.body}")),
+  //     );
+  //   }
+  // }
+
+  bool _isLoading = false;
+
+  Future<void> _processImageWithOpenAI() async {
+    if (_image == null) return;
+
+    setState(() {
+      _isLoading = true; // Start loading
+    });
+
+    var uri = Uri.parse("http://192.168.3.20:5185/api/v1/Products/UploadImage");
+    var request = http.MultipartRequest("POST", uri);
+
+    // Attach the image file
+    request.files.add(await http.MultipartFile.fromPath("file", _image!.path));
+
+    _image = null;
+
+    var streamedResponse = await request.send();
+
+    // Convert streamed response to String
+    var responseBody = await streamedResponse.stream.bytesToString();
+
+    if (streamedResponse.statusCode == 200) {
+      try {
+        var jsonResponse = jsonDecode(responseBody);
+
+        _extrairDadosNotaFiscal(jsonResponse);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erro ao processar resposta: $e")),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false; // Stop loading
+        });
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Erro ao processar imagem: $responseBody")),
+      );
+    }
+  }
+
+  void _extrairDadosNotaFiscal(String jsonData) {
+    try {
+      List<dynamic> decodedList = jsonDecode(jsonData);
+
+      List<Product> novosProdutos =
+          decodedList.map<Product>((item) => Product.fromJson(item)).toList();
+
+      setState(() {
+        _products.addAll(novosProdutos);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "${novosProdutos.length} produtos adicionados ao inventário",
+          ),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erro ao processar JSON: $e")));
     }
   }
 
@@ -85,12 +213,21 @@ class _ProductsScreenState extends State<ProductsScreen> {
       inputImage,
     );
 
-    _extrairDadosNotaFiscal(recognizedText.text);
+    _extrairDadosNotaFiscalORCgoogle(recognizedText.text);
     textRecognizer.close();
+
+    // 🛠️ Clear the image after processing
+    setState(() {
+      _image = null;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Produtos extraídos e adicionados!")),
+    );
   }
 
   // 📌 Extrair Produtos da Nota Fiscal
-  void _extrairDadosNotaFiscal(String texto) {
+  void _extrairDadosNotaFiscalORCgoogle(String texto) {
     RegExp itemRegex = RegExp(
       r'([A-Z\s]+)\s+(\d+)\s+([\d,.]+)',
       multiLine: true,
@@ -108,7 +245,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
               double.tryParse(match.group(3)?.replaceAll(',', '.') ?? '0') ??
               0.0,
           applicationMethod: "Solo",
-          stock: int.tryParse(match.group(2) ?? '1') ?? 1,
+          price: 0.0,
+          vat: 10.0,
+          quantity: int.tryParse(match.group(2) ?? '1') ?? 1,
           usageHistory: [],
         ),
       );
@@ -146,11 +285,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
             Text("📌 Tipo: ${product.type}"),
             Text("💊 Dosagem: ${product.dosage} kg/L"),
             Text("🛠️ Aplicação: ${product.applicationMethod}"),
+            Text("💰 Preço: ${product.price.toStringAsFixed(2)} \$"),
+            Text("🏦 IVA: ${product.vat} %"),
             Text(
-              "📦 Estoque: ${product.stock} unidades",
+              "📦 Estoque: ${product.quantity} unidades",
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: product.stock < 5 ? Colors.red : AppColors.primary,
+                color: product.quantity < 5 ? Colors.red : AppColors.primary,
               ),
             ),
           ],
@@ -177,7 +318,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
-  // 📌 Show Product Details (Track Usage)
+  // 📌 Show Product   (Track Usage)
   void _showProductDetail(BuildContext context, Product product) {
     showModalBottomSheet(
       context: context,
@@ -205,7 +346,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   "🛠️ Método de Aplicação",
                   product.applicationMethod,
                 ),
-                _buildInfoRow("📦 Estoque", "${product.stock} unidades"),
+                _buildInfoRow("📦 Estoque", "${product.quantity} unidades"),
                 const SizedBox(height: 20),
                 _buildUsageHistory(product),
                 const SizedBox(height: 20),
@@ -266,7 +407,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           type: "Fertilizante",
           dosage: 50.0,
           applicationMethod: "Solo",
-          stock: 10,
+          quantity: 10,
           usageHistory: [],
         ),
       );

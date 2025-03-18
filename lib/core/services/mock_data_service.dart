@@ -124,7 +124,7 @@ class MockDataService {
       type: 'Fertilizante',
       dosage: 50.0,
       applicationMethod: 'Solo',
-      stock: 20,
+      quantity: 20,
       price: 100.0,
       vat: 10.0,
       usageHistory: [
@@ -138,7 +138,7 @@ class MockDataService {
       type: 'Defensivo',
       dosage: 10.0,
       applicationMethod: 'Foliar',
-      stock: 15,
+      quantity: 15,
       price: 80.0,
       vat: 10.0,
       usageHistory: [
@@ -152,7 +152,7 @@ class MockDataService {
       type: 'Semente',
       dosage: 100.0,
       applicationMethod: 'Plantio Direto',
-      stock: 50,
+      quantity: 50,
       price: 150.0,
       vat: 12.0,
       usageHistory: [
