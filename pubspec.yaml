@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   fl_chart: ^0.64.0
   http: ^0.13.3
   cupertino_icons: ^1.0.8
@@ -37,6 +38,7 @@ dependencies:
   google_mlkit_text_recognition: ^0.14.0
   drag_and_drop_lists: ^0.4.2
   flutter_launcher_icons: ^0.14.3
+  lottie: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -64,6 +66,10 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+  assets:
+    - assets/lottie/document-hover-unfold.json
+    - assets/lottie/layers-in-reveal.json
+    - assets/lottie/photo-in-reveal.json
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

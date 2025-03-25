@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/models/recommendation.dart';
 import '../../../core/services/mock_data_service.dart';
+import '../../core/models/task_detail.dart';
 
 class RecommendationsScreen extends StatefulWidget {
   final MockDataService mockService;
@@ -76,6 +77,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     String type,
     String date,
     String notes,
+    List<String> tasks,
   ) {
     final newRecommendation = Recommendation(
       parcelName: parcel,
@@ -83,6 +85,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
       notes: notes,
       status: "To Do",
       type: type,
+      tasks: tasks.map((task) => TaskDetail(name: task)).toList(),
     );
 
     setState(() {
@@ -98,34 +101,63 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text(
-            recommendation.parcelName,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInfoRow("📌 Tipo", recommendation.type),
-              _buildInfoRow(
-                "📅 Data Recomendada",
-                recommendation.recommendedDate,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            // 🟢 Ensure state updates inside the dialog
+            return AlertDialog(
+              title: Text(
+                recommendation.parcelName,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              _buildInfoRow(
-                "🔍 Observações",
-                recommendation.notes.isNotEmpty
-                    ? recommendation.notes
-                    : "Nenhuma",
+              content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInfoRow("📌 Tipo", recommendation.type),
+                    _buildInfoRow(
+                      "📅 Data Recomendada",
+                      recommendation.recommendedDate,
+                    ),
+                    _buildInfoRow(
+                      "🔍 Observações",
+                      recommendation.notes.isNotEmpty
+                          ? recommendation.notes
+                          : "Nenhuma",
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      "✔️ Passos a Seguir:",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    Column(
+                      children:
+                          recommendation.tasks.map((task) {
+                            return CheckboxListTile(
+                              controlAffinity:
+                                  ListTileControlAffinity
+                                      .leading, // 🟢 Move checkbox to the left
+                              title: Text(task.name),
+                              value: task.completed,
+                              onChanged: (value) {
+                                setState(() {
+                                  // 🟢 Ensure immediate update inside the dialog
+                                  task.completed = value ?? false;
+                                });
+                              },
+                            );
+                          }).toList(),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text("Fechar"),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Fechar"),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -157,6 +189,14 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     String type = "";
     String date = "";
     String notes = "";
+    List<String> tasks = [
+      "1- Jet Gold = 50 ml/ha",
+      "2- Unizeb Gold 75% = 1,5 kgs/ha",
+      "3- Methomyl 90% = 300 gramos/ha",
+      "4- Brivo ( Piraclostrobin 26% + Difenoconazole 30%) = 300 ml/ha",
+      "5- Treky Top = 400 ml/ha",
+      "6- Fluid Max Orange = 120 ml/ha.",
+    ];
 
     showDialog(
       context: context,
@@ -167,7 +207,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
-                decoration: const InputDecoration(labelText: "Parcela"),
+                decoration: const InputDecoration(labelText: "Talhão"),
                 onChanged: (value) => parcel = value,
               ),
               TextField(
@@ -192,7 +232,7 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
             ElevatedButton(
               onPressed: () {
                 if (parcel.isNotEmpty && type.isNotEmpty && date.isNotEmpty) {
-                  _addNewRecommendation(parcel, type, date, notes);
+                  _addNewRecommendation(parcel, type, date, notes, tasks);
                   Navigator.pop(context);
                 }
               },

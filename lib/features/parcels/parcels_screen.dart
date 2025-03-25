@@ -12,16 +12,16 @@ class ParcelsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Parcelas')),
+      appBar: AppBar(title: const Text('Talhões')),
       body: FutureBuilder<List<Parcel>>(
         future: mockService.fetchParcels(),
         builder: (ctx, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return const Center(child: Text('Erro ao carregar parcelas'));
+            return const Center(child: Text('Erro ao carregar Talhões'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('Nenhuma parcela encontrada'));
+            return const Center(child: Text('Nenhuma Talhão encontrada'));
           }
 
           final parcels = snapshot.data!;
@@ -42,7 +42,7 @@ class ParcelsScreen extends StatelessWidget {
           mockService.addParcel(
             Parcel(
               id: '1',
-              name: 'Parcela A',
+              name: 'Talhão A',
               production: 5000, // kg
               cost: 1200, // R$
               revenue: 3000, // R$

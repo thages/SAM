@@ -4,12 +4,13 @@ import '../models/product.dart';
 import '../models/parcel_detail.dart';
 import '../models/product_usage.dart';
 import '../models/recommendation.dart';
+import '../models/task_detail.dart';
 
 class MockDataService {
   List<Parcel> parcels = [
     Parcel(
       id: '1',
-      name: 'Parcela A',
+      name: 'Talhão A',
       production: 5000, // kg
       cost: 1200, // R$
       revenue: 3000, // R$
@@ -36,7 +37,7 @@ class MockDataService {
     ),
     Parcel(
       id: '2',
-      name: 'Parcela B',
+      name: 'Talhão B',
       production: 7000,
       cost: 1800,
       revenue: 4000,
@@ -63,7 +64,7 @@ class MockDataService {
     ),
     Parcel(
       id: '3',
-      name: 'Parcela C',
+      name: 'Talhão C',
       production: 6000,
       cost: 1500,
       revenue: 3200,
@@ -90,7 +91,7 @@ class MockDataService {
     ),
     Parcel(
       id: '4',
-      name: 'Parcela D',
+      name: 'Talhão D',
       production: 8000,
       cost: 2000,
       revenue: 5000,
@@ -128,8 +129,8 @@ class MockDataService {
       price: 100.0,
       vat: 10.0,
       usageHistory: [
-        ProductUsage(date: '2024-03-01', parcelName: 'Parcela A', dose: 25.0),
-        ProductUsage(date: '2024-02-20', parcelName: 'Parcela C', dose: 15.0),
+        ProductUsage(date: '2024-03-01', parcelName: 'Talhão A', dose: 25.0),
+        ProductUsage(date: '2024-02-20', parcelName: 'Talhão C', dose: 15.0),
       ],
     ),
     Product(
@@ -142,8 +143,8 @@ class MockDataService {
       price: 80.0,
       vat: 10.0,
       usageHistory: [
-        ProductUsage(date: '2024-02-25', parcelName: 'Parcela B', dose: 5.0),
-        ProductUsage(date: '2024-02-15', parcelName: 'Parcela D', dose: 8.0),
+        ProductUsage(date: '2024-02-25', parcelName: 'Talhão B', dose: 5.0),
+        ProductUsage(date: '2024-02-15', parcelName: 'Talhão D', dose: 8.0),
       ],
     ),
     Product(
@@ -156,8 +157,8 @@ class MockDataService {
       price: 150.0,
       vat: 12.0,
       usageHistory: [
-        ProductUsage(date: '2024-03-05', parcelName: 'Parcela A', dose: 30.0),
-        ProductUsage(date: '2024-02-28', parcelName: 'Parcela C', dose: 20.0),
+        ProductUsage(date: '2024-03-05', parcelName: 'Talhão A', dose: 30.0),
+        ProductUsage(date: '2024-02-28', parcelName: 'Talhão C', dose: 20.0),
       ],
     ),
   ];
@@ -187,25 +188,36 @@ class MockDataService {
 
   List<Recommendation> recommendations = [
     Recommendation(
-      parcelName: "Parcela A",
+      parcelName: "Talhão A",
       type: "Adubação",
       recommendedDate: "2025-03-15",
       status: "Pendente",
       notes: "Aplicação de fertilizante NPK recomendada após a irrigação.",
+      tasks: [
+        TaskDetail(name: "Preparar o solo", completed: true),
+        TaskDetail(name: "Aplicar o fertilizante"),
+        TaskDetail(name: "Irrigar o talhão"),
+      ],
     ),
     Recommendation(
-      parcelName: "Parcela B",
+      parcelName: "Talhão B",
       type: "Irrigação",
       recommendedDate: "2025-03-17",
       status: "Pendente",
       notes: "Manter irrigação leve para evitar compactação do solo.",
+      tasks: [
+        TaskDetail(name: "Verificar o sistema de irrigação", completed: true),
+        TaskDetail(name: "Ajustar a vazão da água"),
+        TaskDetail(name: "Monitorar a umidade do solo"),
+      ],
     ),
     Recommendation(
-      parcelName: "Parcela C",
+      parcelName: "Talhão C",
       type: "Pulverização",
       recommendedDate: "2025-03-18",
       status: "Pendente",
       notes: "Pulverização preventiva contra pragas devido à alta umidade.",
+      tasks: [],
     ),
   ];
 

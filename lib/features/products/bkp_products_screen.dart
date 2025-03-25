@@ -235,7 +235,7 @@
 //               leading: const Icon(Icons.history, color: Colors.orange),
 //               title: Text("Data: ${usage.date}"),
 //               subtitle: Text(
-//                 "🌱 Parcela: ${usage.parcelName}\n📊 Dose: ${usage.dose} kg/L",
+//                 "🌱 Talhão: ${usage.parcelName}\n📊 Dose: ${usage.dose} kg/L",
 //               ),
 //             );
 //           }).toList(),
@@ -248,7 +248,7 @@
 //       product.usageHistory.add(
 //         ProductUsage(
 //           date: DateTime.now().toString().split(' ')[0],
-//           parcelName: "Parcela X",
+//           parcelName: "Talhão X",
 //           dose: product.dosage,
 //         ),
 //       );

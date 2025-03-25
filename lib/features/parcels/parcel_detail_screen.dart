@@ -19,7 +19,7 @@ class ParcelDetailScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _buildSectionTitle("📍 Informações da Parcela"),
+            _buildSectionTitle("📍 Informações da Talhão"),
             _buildInfoCard([
               _buildInfoRow("Produção", "${parcel.production} kg"),
               _buildInfoRow("Produtividade", "${parcel.detail.yields} kg/ha"),

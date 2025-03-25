@@ -9,6 +9,7 @@ import '../../../core/models/product.dart';
 import '../../../core/services/mock_data_service.dart';
 import '../../../shared/themes/app_theme.dart';
 import '../../core/models/product_usage.dart';
+import '../../shared/components/loading_animation_loop.dart';
 
 class ProductsScreen extends StatefulWidget {
   final MockDataService mockService;
@@ -21,8 +22,6 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen> {
   late List<Product> _products;
   File? _image;
-  String openAiApiKey =
-      "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";
 
   @override
   void initState() {
@@ -34,34 +33,50 @@ class _ProductsScreenState extends State<ProductsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Controle de Insumos")),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child:
-                _products.isEmpty
-                    ? const Center(child: Text("Nenhum insumo cadastrado"))
-                    : ListView.builder(
-                      padding: const EdgeInsets.all(12),
-                      itemCount: _products.length,
-                      itemBuilder: (ctx, i) {
-                        final product = _products[i];
-                        return _buildProductCard(context, product);
-                      },
-                    ),
+          Column(
+            children: [
+              Expanded(
+                child:
+                    _products.isEmpty
+                        ? const Center(child: Text("Nenhum insumo cadastrado"))
+                        : ListView.builder(
+                          padding: const EdgeInsets.all(12),
+                          itemCount: _products.length,
+                          itemBuilder: (ctx, i) {
+                            final product = _products[i];
+                            return _buildProductCard(context, product);
+                          },
+                        ),
+              ),
+              const SizedBox(height: 20),
+              _image != null
+                  ? Image.file(_image!)
+                  : const Text('📸 Nenhuma nota fiscal escaneada'),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.camera_alt),
+                label: const Text("Capturar Nota Fiscal"),
+                onPressed: _getImage,
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
-
-          _image != null
-              ? Image.file(_image!)
-              : const Text('📸 Nenhuma nota fiscal escaneada'),
-          const SizedBox(height: 10),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.camera_alt),
-            label: const Text("Capturar Nota Fiscal"),
-            // backgroundColor: AppColors.primary,
-            // child: const Icon(Icons.add, color: Colors.white),
-            onPressed: _getImage,
-          ),
+          // Loading animation overlay
+          if (_isLoading)
+            Container(
+              color: Colors.white.withOpacity(0.9),
+              child: const Center(
+                child: LoadingAnimationLoop(
+                  lottieFiles: [
+                    'assets/lottie/photo-in-reveal.json',
+                    'assets/lottie/document-hover-unfold.json',
+                    'assets/lottie/layers-in-reveal.json',
+                  ],
+                  duration: Duration(seconds: 3),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -80,61 +95,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
-  // 📌 Processar OCR via OpenAI
-  // Future<void> _processImageWithOpenAI() async {
-  //   if (_image == null) return;
-
-  //   // // Converte imagem para base64
-  //   // String base64Image = base64Encode(await _image!.readAsBytes());
-
-  //   // // Define o prompt para a OpenAI
-  //   // String prompt =
-  //   //     "Extraia os produtos da nota fiscal e retorne os seguintes dados para cada item: "
-  //   //     "description (nome do produto), cant. (quantidade), precio (preço unitário), IVA (imposto aplicado). "
-  //   //     "Retorne a resposta em formato JSON.";
-
-  //   // // Chamada à API da OpenAI
-  //   // var response = await http.post(
-  //   //   Uri.parse("https://api.openai.com/v1/chat/completions"),
-  //   //   headers: {
-  //   //     "Authorization": "Bearer $openAiApiKey",
-  //   //     "Content-Type": "application/json",
-  //   //   },
-  //   //   body: jsonEncode({
-  //   //     "model": "gpt-4-vision-preview", // Usa GPT-4 com suporte a imagens
-  //   //     "messages": [
-  //   //       {
-  //   //         "role": "system",
-  //   //         "content":
-  //   //             "Você é um assistente especialista em OCR de notas fiscais.",
-  //   //       },
-  //   //       {
-  //   //         "role": "user",
-  //   //         "content": [
-  //   //           {"type": "text", "text": prompt},
-  //   //           {
-  //   //             "type": "image_url",
-  //   //             "image_url": "data:image/jpeg;base64,$base64Image",
-  //   //           },
-  //   //         ],
-  //   //       },
-  //   //     ],
-  //   //     "max_tokens": 1000,
-  //   //   }),
-  //   // );
-
-  //   if (response.statusCode == 200) {
-  //     var jsonResponse = jsonDecode(response.body);
-  //     String extractedText = jsonResponse["choices"][0]["message"]["content"];
-
-  //     _extrairDadosNotaFiscal(extractedText);
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text("Erro ao processar imagem: ${response.body}")),
-  //     );
-  //   }
-  // }
-
   bool _isLoading = false;
 
   Future<void> _processImageWithOpenAI() async {
@@ -143,8 +103,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
     setState(() {
       _isLoading = true; // Start loading
     });
-
-    var uri = Uri.parse("http://192.168.3.20:5185/api/v1/Products/UploadImage");
+    var local = "http://192.168.3.20:5185";
+    var apiUrl = "https://sam-api-e6pj.onrender.com";
+    var uri = Uri.parse("$apiUrl/api/v1/Products/UploadImage");
     var request = http.MultipartRequest("POST", uri);
 
     // Attach the image file
@@ -159,9 +120,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
 
     if (streamedResponse.statusCode == 200) {
       try {
-        var jsonResponse = jsonDecode(responseBody);
-
-        _extrairDadosNotaFiscal(jsonResponse);
+        _extrairDadosNotaFiscal(responseBody);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Erro ao processar resposta: $e")),
@@ -376,7 +335,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
               leading: const Icon(Icons.history, color: Colors.orange),
               title: Text("Data: ${usage.date}"),
               subtitle: Text(
-                "🌱 Parcela: ${usage.parcelName}\n📊 Dose: ${usage.dose} kg/L",
+                "🌱 Talhão: ${usage.parcelName}\n📊 Dose: ${usage.dose} kg/L",
               ),
             );
           }).toList(),
@@ -389,7 +348,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
       product.usageHistory.add(
         ProductUsage(
           date: DateTime.now().toString().split(' ')[0],
-          parcelName: "Parcela X",
+          parcelName: "Talhão X",
           dose: product.dosage,
         ),
       );

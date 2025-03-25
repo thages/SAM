@@ -43,7 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Column(
               children: [
                 // Produção
-                _buildSectionTitle("Produção por Parcela"),
+                _buildSectionTitle("Produção por Talhão"),
                 _buildChartCard(
                   _buildProductionChart(parcels),
                   legends: [
@@ -59,7 +59,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
 
                 // ROI
-                _buildSectionTitle("ROI por Parcela"),
+                _buildSectionTitle("ROI por Talhão"),
                 _buildChartCard(
                   _buildROIChart(parcels),
                   legends: [_buildLegendItem(AppColors.blue, "ROI (%)")],

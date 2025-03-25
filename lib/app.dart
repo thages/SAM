@@ -130,7 +130,7 @@ class _MyFarmAppState extends State<MyFarmApp> {
                 icon: Icon(Icons.dashboard),
                 label: 'Dashboard',
               ),
-              BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Parcelas'),
+              BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Talhões'),
               BottomNavigationBarItem(
                 icon: Icon(Icons.category),
                 label: 'Insumos',
