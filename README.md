@@ -1,5 +1,5 @@
 # SAM
 
-A MVP Flutter project for Strategic Agricultural Management.
+A MVP Flutter project in development for Strategic Agricultural Management.
 
 
