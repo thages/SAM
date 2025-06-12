@@ -163,7 +163,6 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
     );
   }
 
-  /// 🟢 Reusable Info Row UI for Neat Display
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),

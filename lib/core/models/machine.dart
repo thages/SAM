@@ -19,12 +19,10 @@ class Machine {
     required this.depreciationCostPerHour,
   });
 
-  // 📌 Método para calcular o custo por hora total
   double calculateCostPerHour() {
     return fuelCostPerHour + maintenanceCostPerHour + depreciationCostPerHour;
   }
 
-  // 📌 Método para calcular o custo total baseado nas horas usadas
   double calculateTotalCost() {
     return hoursUsed * calculateCostPerHour();
   }

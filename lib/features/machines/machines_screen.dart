@@ -31,7 +31,7 @@ class _MachinesScreenState extends State<MachinesScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
               child: CircularProgressIndicator(),
-            ); // ✅ Indicador de carregamento
+            );
           } else if (snapshot.hasError) {
             return Center(
               child: Text("Erro ao carregar máquinas: ${snapshot.error}"),
@@ -66,7 +66,6 @@ class _MachinesScreenState extends State<MachinesScreen> {
     );
   }
 
-  // 📌 Cartão de Máquina
   Widget _buildMachineCard(BuildContext context, Machine machine) {
     return Card(
       elevation: 4,
@@ -98,7 +97,6 @@ class _MachinesScreenState extends State<MachinesScreen> {
     );
   }
 
-  // 📌 Exibir Detalhes da Máquina
   void _showMachineDetail(BuildContext context, Machine machine) {
     showModalBottomSheet(
       context: context,
@@ -141,15 +139,13 @@ class _MachinesScreenState extends State<MachinesScreen> {
     );
   }
 
-  // 📌 Registrar Novo Uso da Máquina
   void _registerMachineUsage(Machine machine) {
     setState(() {
-      machine.hoursUsed += 5; // 🛠️ Simula 5h de uso
+      machine.hoursUsed += 5; // Simula 5h de uso
     });
     Navigator.pop(context);
   }
 
-  // 📌 Adicionar Nova Máquina
   void _addNewMachine() {
     setState(() {
       widget.mockService.machines.add(
@@ -168,10 +164,9 @@ class _MachinesScreenState extends State<MachinesScreen> {
 
     _machineData =
         widget.mockService
-            .fetchMachines(); // ✅ Atualiza os dados após adicionar nova máquina
+            .fetchMachines(); 
   }
 
-  // 📌 Info Row UI
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),

@@ -70,7 +70,6 @@ class ParcelDetailScreen extends StatelessWidget {
     );
   }
 
-  // 📌 Section Title
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -85,7 +84,6 @@ class ParcelDetailScreen extends StatelessWidget {
     );
   }
 
-  // 📌 Information Card
   Widget _buildInfoCard(List<Widget> children) {
     return Card(
       elevation: 4,
@@ -97,7 +95,6 @@ class ParcelDetailScreen extends StatelessWidget {
     );
   }
 
-  // 📌 Information Row
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -125,7 +122,6 @@ class ParcelDetailScreen extends StatelessWidget {
     );
   }
 
-  // 📌 Financial Overview Card
   Widget _buildFinancialCard(
     double profit,
     double roi,
@@ -158,7 +154,6 @@ class ParcelDetailScreen extends StatelessWidget {
     );
   }
 
-  // 📈 Mock Data for Economic History Chart
   Widget _buildHistoryChart() {
     return Card(
       elevation: 4,
@@ -175,7 +170,6 @@ class ParcelDetailScreen extends StatelessWidget {
     );
   }
 
-  // 📌 Cost Breakdown (Direct & Indirect Costs)
   Widget _buildCostBreakdown() {
     return Card(
       elevation: 4,
@@ -201,7 +195,6 @@ class ParcelDetailScreen extends StatelessWidget {
     );
   }
 
-  // 📌 Product Usage (Fertilizers, Pesticides, Seeds)
   Widget _buildProductUsage() {
     return Card(
       elevation: 4,

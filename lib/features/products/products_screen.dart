@@ -82,7 +82,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  // 📌 Capturar Imagem da Nota Fiscal
   Future<void> _getImage() async {
     final pickedFile = await ImagePicker().pickImage(
       source: ImageSource.camera,
@@ -162,7 +161,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
-  // 📌 Processar OCR da Nota Fiscal
   Future<void> _processImage() async {
     if (_image == null) return;
 
@@ -175,7 +173,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     _extrairDadosNotaFiscalORCgoogle(recognizedText.text);
     textRecognizer.close();
 
-    // 🛠️ Clear the image after processing
     setState(() {
       _image = null;
     });
@@ -185,7 +182,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  // 📌 Extrair Produtos da Nota Fiscal
   void _extrairDadosNotaFiscalORCgoogle(String texto) {
     RegExp itemRegex = RegExp(
       r'([A-Z\s]+)\s+(\d+)\s+([\d,.]+)',
@@ -225,7 +221,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  // 📌 Product Card UI
   Widget _buildProductCard(BuildContext context, Product product) {
     return Card(
       elevation: 4,
@@ -263,7 +258,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  // 📌 Get Icon Based on Product Type
   Widget _getProductIcon(String type) {
     switch (type.toLowerCase()) {
       case "fertilizante":
@@ -277,7 +271,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     }
   }
 
-  // 📌 Show Product   (Track Usage)
   void _showProductDetail(BuildContext context, Product product) {
     showModalBottomSheet(
       context: context,
@@ -322,7 +315,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  // 📌 Display Product Usage History
   Widget _buildUsageHistory(Product product) {
     if (product.usageHistory.isEmpty) {
       return const Text("📋 Nenhum uso registrado.");
@@ -342,7 +334,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
-  // 📌 Register New Product Usage
   void _registerProductUsage(Product product) {
     setState(() {
       product.usageHistory.add(
@@ -356,7 +347,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     Navigator.pop(context);
   }
 
-  // 📌 Register New Product
   void _addNewProduct() {
     setState(() {
       widget.mockService.products.add(
@@ -373,7 +363,6 @@ class _ProductsScreenState extends State<ProductsScreen> {
     });
   }
 
-  // 📌 Info Row UI
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
